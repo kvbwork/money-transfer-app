@@ -1,0 +1,20 @@
+version: "3"
+services:
+  backend:
+    image: "kvbdev/money-transfer-rest:latest"
+    build: "./backend"
+    container_name: "money-tranfer-rest"
+    ports:
+      - "5500:5500"
+    volumes:
+      - "./appdata:/appdata"
+    expose:
+      - "5500"
+  frontend:
+    image: "kvbdev/money-transfer-front:latest"
+    container_name: "money-transfer-front"
+    build: ./frontend
+    ports:
+      - "0.0.0.0:80:80"
+    depends_on:
+      - "backend"
