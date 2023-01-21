@@ -2,8 +2,6 @@ package ru.netology.moneytransfer.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import ru.netology.moneytransfer.bean.ConfirmationCodeGenerator;
 import ru.netology.moneytransfer.entity.CardAccount;
 import ru.netology.moneytransfer.entity.CardTransferOperation;
@@ -11,6 +9,7 @@ import ru.netology.moneytransfer.exception.NotFoundException;
 import ru.netology.moneytransfer.exception.TransferException;
 import ru.netology.moneytransfer.mapper.CardTransferOperationMapper;
 import ru.netology.moneytransfer.model.request.CardTransferRequest;
+import ru.netology.moneytransfer.model.request.TransferConfirmationRequest;
 import ru.netology.moneytransfer.model.response.OperationSuccess;
 import ru.netology.moneytransfer.repository.CardTransferOperationRepository;
 import ru.netology.moneytransfer.validation.CardTransferOperationValidator;
@@ -37,6 +36,9 @@ class CardTransferServiceTest {
             "1111222233334444", "12/99", "123",
             "4444333322221111",
             new CardTransferRequest.Amount(100_000L, "RUB")
+    );
+    static final TransferConfirmationRequest TEST_CONFIRMATION_REQUEST = new TransferConfirmationRequest(
+            TEST_OPERATION_ID, TEST_CONFIRM__CODE
     );
 
     CardTransferOperationRepository cardTransferOperationRepository;
@@ -124,14 +126,14 @@ class CardTransferServiceTest {
         var expectedCardFromAmount = cardAccountFrom.getAmount().subtract(amountWithFee);
         var expectedCardToAmount = cardAccountTo.getAmount().add(operation.getAmount());
 
-        sut.confirmTransfer(TEST_OPERATION_ID, TEST_CONFIRM__CODE);
+        sut.confirmTransfer(TEST_CONFIRMATION_REQUEST);
         verify(cardAccountFrom, times(1)).setAmount(expectedCardFromAmount);
         verify(cardAccountTo, times(1)).setAmount(expectedCardToAmount);
     }
 
     @Test
     void confirmTransfer_saveConfirmedOperation_success() {
-        sut.confirmTransfer(TEST_OPERATION_ID, TEST_CONFIRM__CODE);
+        sut.confirmTransfer(TEST_CONFIRMATION_REQUEST);
         verify(operation, times(1)).setConfirmed(true);
         verify(cardTransferOperationRepository, times(1)).save(operation);
     }
@@ -140,7 +142,7 @@ class CardTransferServiceTest {
     void confirmTransfer_wrongConfirmationCode_throwsException() {
         var wrongConfirmCode = "7777";
         assertThrowsExactly(TransferException.class, () -> {
-            sut.confirmTransfer(TEST_OPERATION_ID, wrongConfirmCode);
+            sut.confirmTransfer(new TransferConfirmationRequest(TEST_OPERATION_ID, wrongConfirmCode));
         });
     }
 
@@ -148,14 +150,14 @@ class CardTransferServiceTest {
     void confirmTransfer_alreadyConfirmed_throwsException() {
         when(operation.isConfirmed()).thenReturn(true);
         assertThrowsExactly(TransferException.class, () -> {
-            sut.confirmTransfer(TEST_OPERATION_ID, TEST_OPERATION_ID);
+            sut.confirmTransfer(TEST_CONFIRMATION_REQUEST);
         });
     }
 
     @Test
     void confirmTransfer_unknownId_throwsException() {
         assertThrowsExactly(NotFoundException.class, () -> {
-            sut.confirmTransfer(UUID.randomUUID().toString(), TEST_OPERATION_ID);
+            sut.confirmTransfer(new TransferConfirmationRequest(UUID.randomUUID().toString(), TEST_OPERATION_ID));
         });
     }
 

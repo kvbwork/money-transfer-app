@@ -23,7 +23,7 @@
 [
   {
     "cardNumber":"1111222233334444",    // номер карты
-    "validTill":"2026-12-31",           // последний день действия
+    "validTill":"2099-12-31",           // последний день действия
     "cvv":"111",                        // секретный код
     "amount":10000,                     // средства на счете
     "limit":0,                          // лимит остатка (может быть отрицательныым)
@@ -36,7 +36,7 @@
 
 ```
 server.port=5500                                // сетевой порт приложения
-operation.fee.multiplier=0.01                   // множитель комиссии
+operation.fee.multiplier=0.01                   // множитель комиссии (0.01=1%)
 operation.currency.allowed=RUR                  // список разрешенных валют
 operation.log.filepath=appdata/operations.log   // путь к лог-файлу транзакций
 operation.log.enabled=true                      // разрешение записи в лог
@@ -50,13 +50,20 @@ cardaccounts.export.filepath=appdata/accounts-last.json   // последнее 
 
 #### Сборка проекта:
 
-Сборка проекта выполняется вместе с запуском docker-compose в корне проекта.
+Docker контейнер с Backend приложением можно собрать 3 способами.
 
-Для сборки только backend следует выполнить:
+1. Сборка проекта выполняется вместе с запуском `docker-compose up` в корне проекта.
 
-```
-docker build -t kvbdev/money-transfer-rest .
-```
+2. Компиляция выполняется изолированно, внутри Docker контейнеров.
+   ```
+   docker build -t kvbdev/money-transfer-rest .
+   ```
+
+3. Компиляция выполняется на хосте и результат упаковывается в контейнер.
+   ```
+   ./mvnw clean package
+   docker build -t kvbdev/money-transfer-rest -f Dockerfile-dev .
+   ```
 
 #### Запуск интеграционных тестов:
 
@@ -70,24 +77,15 @@ docker build -t kvbdev/money-transfer-rest .
 mvn verify -Pintegration
 ```
 
-В результате в папке `./appdata` появятся или обновятся файлы.
+В результате в папке `./appdata` появится или обновится файл `operations.log`.
 
-- `operations.log` содержит лог транзакций
-- `accounts-last.json` содержит последнее состояние аккаунтов.
-
-#### Запуск приложения
+#### Отдельный запуск Backend приложения
 
 ```
-docker-compose up -d
+docker run -v $(pwd)/appdata:/appdata -p 5500:5500 kvbdev/money-transfer-rest
 ```
 
-После запуска всего приложения, оно начнет отвечать на `80` порту.
-При этом запросы на `/api` эндпоинт перенаправляются к backend части.
-
-![assets/graph-common.png](assets/graph-common.png)
-
-Для удобства тестирования Backend должен быть доступен по локальному адресу
-[http://localhost:5500](http://localhost:5500).
+После запуска Backend будет отвечать по пути [http://localhost:5500](http://localhost:5500).
 
 #### Примеры запросов
 

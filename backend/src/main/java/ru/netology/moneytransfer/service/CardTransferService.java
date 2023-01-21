@@ -13,6 +13,7 @@ import ru.netology.moneytransfer.exception.NotFoundException;
 import ru.netology.moneytransfer.exception.TransferException;
 import ru.netology.moneytransfer.mapper.CardTransferOperationMapper;
 import ru.netology.moneytransfer.model.request.CardTransferRequest;
+import ru.netology.moneytransfer.model.request.TransferConfirmationRequest;
 import ru.netology.moneytransfer.model.response.OperationSuccess;
 import ru.netology.moneytransfer.repository.CardTransferOperationRepository;
 import ru.netology.moneytransfer.validation.CardTransferOperationValidator;
@@ -60,7 +61,8 @@ public class CardTransferService {
         return operation.getAmount().multiply(feeMultiplier);
     }
 
-    public OperationSuccess confirmTransfer(String operationId, String confirmationCode) {
+    public OperationSuccess confirmTransfer(@Valid TransferConfirmationRequest confirmationRequest) {
+        String operationId = confirmationRequest.getOperationId();
         UUID uid = UUID.fromString(operationId);
 
         CardTransferOperation operation = cardTransferOperationRepository.findById(uid)
@@ -70,7 +72,7 @@ public class CardTransferService {
             throw new TransferException(operation, "Перевод уже был подтвержден.");
         }
 
-        if (!operation.getConfirmationCode().equals(confirmationCode)) {
+        if (!operation.getConfirmationCode().equals(confirmationRequest.getCode())) {
             throw new TransferException(operation, "Код подтверждения не совпадает.");
         }
 

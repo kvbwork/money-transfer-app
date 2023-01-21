@@ -8,7 +8,6 @@ import ru.netology.moneytransfer.entity.CardAccount;
 import ru.netology.moneytransfer.entity.CardTransferOperation;
 import ru.netology.moneytransfer.service.CardAccountService;
 
-import javax.validation.Validator;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
@@ -21,7 +20,6 @@ public class CardTransferOperationValidator implements org.springframework.valid
     private Set<String> currencyAllowed;
 
     private final CardAccountService cardAccountService;
-    private final Validator validator;
 
     @Override
     public boolean supports(Class<?> clazz) {

@@ -15,18 +15,21 @@ import ru.netology.moneytransfer.repository.CardAccountRepository;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Getter
 @Setter
 public class CardAccountFileService extends CardAccountService implements InitializingBean {
     private static final Logger logger = LoggerFactory.getLogger(CardAccountFileService.class);
 
+    private final Lock fileWriteLock = new ReentrantLock();
+    private final ObjectMapper mapper;
+
     @Value("${cardaccounts.import.filepath:}")
     String importFilePath;
     @Value("${cardaccounts.export.filepath:}")
     String exportFilePath;
-
-    private final ObjectMapper mapper;
 
     public CardAccountFileService(
             CardAccountRepository cardAccountRepository,
@@ -68,13 +71,22 @@ public class CardAccountFileService extends CardAccountService implements Initia
     @Override
     public CardAccount save(CardAccount cardAccount) {
         CardAccount savedCardAccount = super.save(cardAccount);
+        trySave();
+        return savedCardAccount;
+    }
+
+    private void trySave() {
         if (isExportEnabled()) {
+            boolean locked = fileWriteLock.tryLock();
             try {
-                exportToFile(exportFilePath);
+                if (locked) {
+                    exportToFile(exportFilePath);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            } finally {
+                if (locked) fileWriteLock.unlock();
             }
         }
-        return savedCardAccount;
     }
 }

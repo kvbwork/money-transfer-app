@@ -24,7 +24,7 @@ public class TransferController {
 
     @PostMapping(path = "/confirmOperation", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public OperationSuccess confirmOperation(@RequestBody TransferConfirmationRequest request) {
-        return cardTransferService.confirmTransfer(request.getOperationId(), request.getCode());
+        return cardTransferService.confirmTransfer(request);
     }
 
 }

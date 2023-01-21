@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import ru.netology.moneytransfer.entity.CardTransferOperation;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
