@@ -97,26 +97,26 @@ class CardTransferServiceTest {
     }
 
     @Test
-    void makeTransferOperation_call_Mapper() {
-        sut.makeTransferOperation(TEST_REQUEST);
+    void registerTransfer_call_CardTransferOperationMapper() {
+        sut.registerTransfer(TEST_REQUEST);
         verify(cardTransferOperationMapper, times(1)).fromRequest(any(CardTransferRequest.class));
     }
 
     @Test
-    void makeTransferOperation_save_operation() {
-        sut.makeTransferOperation(TEST_REQUEST);
+    void registerTransfer_save_operation() {
+        sut.registerTransfer(TEST_REQUEST);
         verify(cardTransferOperationRepository, times(1)).save(operation);
     }
 
     @Test
-    void makeTransferOperation_return_Id() {
-        OperationSuccess result = sut.makeTransferOperation(TEST_REQUEST);
+    void registerTransfer_return_Id() {
+        OperationSuccess result = sut.registerTransfer(TEST_REQUEST);
         assertThat(result.getOperationId(), equalTo(TEST_OPERATION_ID));
     }
 
     @Test
-    void makeTransferOperation_setFee() {
-        OperationSuccess result = sut.makeTransferOperation(TEST_REQUEST);
+    void registerTransfer_setFee() {
+        OperationSuccess result = sut.registerTransfer(TEST_REQUEST);
         verify(operation, times(1)).setFee(TEST_FEE_AMOUNT);
     }
 

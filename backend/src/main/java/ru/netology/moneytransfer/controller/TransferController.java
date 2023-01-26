@@ -19,7 +19,7 @@ public class TransferController {
 
     @PostMapping(path = "/transfer", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public OperationSuccess transfer(@RequestBody CardTransferRequest cardTransferRequest) {
-        return cardTransferService.makeTransferOperation(cardTransferRequest);
+        return cardTransferService.registerTransfer(cardTransferRequest);
     }
 
     @PostMapping(path = "/confirmOperation", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

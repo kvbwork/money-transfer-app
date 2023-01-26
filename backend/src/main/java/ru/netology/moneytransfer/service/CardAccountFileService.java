@@ -43,7 +43,9 @@ public class CardAccountFileService extends CardAccountService implements Initia
     @Override
     public void afterPropertiesSet() throws Exception {
         if (isImportEnabled()) {
-            importFromFile(importFilePath);
+            logger.debug("Загрузка CardAccount из {}", getImportFilePath());
+            int count = importFromFile(importFilePath);
+            logger.info("В репозиторий добавлены CardAccount: {}", count);
         }
     }
 
@@ -55,12 +57,11 @@ public class CardAccountFileService extends CardAccountService implements Initia
         return exportFilePath != null && !exportFilePath.isBlank();
     }
 
-    public void importFromFile(String filePath) throws IOException {
-        logger.debug("Загрузка CardAccount из {}", getImportFilePath());
+    public int importFromFile(String filePath) throws IOException {
         List<CardAccount> cardAccounts = mapper.readValue(new File(filePath), new TypeReference<>() {
         });
         cardAccountRepository.saveAll(cardAccounts);
-        logger.info("В репозиторий добавлены CardAccount: {}", cardAccounts.size());
+        return cardAccounts.size();
     }
 
     public void exportToFile(String filePath) throws IOException {

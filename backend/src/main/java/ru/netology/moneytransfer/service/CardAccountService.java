@@ -25,7 +25,8 @@ public class CardAccountService {
     private int lockAwaitSeconds = 10;
 
     public Optional<CardAccount> findByCardNumber(String cardNumber) {
-        return cardAccountRepository.findByCardNumber(cardNumber);
+        return cardAccountRepository.findByCardNumber(cardNumber)
+                .map(cardAccountMapper::makeCopy);
     }
 
     public CardAccount save(CardAccount cardAccount) {
@@ -42,8 +43,7 @@ public class CardAccountService {
         boolean successLock = lockMap.computeIfAbsent(cardNumber, k -> new ReentrantLock())
                 .tryLock(getLockAwaitSeconds(), TimeUnit.SECONDS);
         if (successLock) {
-            return cardAccountRepository.findByCardNumber(cardNumber)
-                    .map(cardAccountMapper::makeCopy);
+            return findByCardNumber(cardNumber);
         }
         return Optional.empty();
     }

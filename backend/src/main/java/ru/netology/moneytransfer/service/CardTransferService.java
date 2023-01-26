@@ -37,7 +37,7 @@ public class CardTransferService {
     @Value("${operation.fee.multiplier:0.0}")
     private BigDecimal feeMultiplier;
 
-    public OperationSuccess makeTransferOperation(@Valid CardTransferRequest cardTransferRequest) {
+    public OperationSuccess registerTransfer(@Valid CardTransferRequest cardTransferRequest) {
         CardTransferOperation operation = cardTransferOperationMapper.fromRequest(cardTransferRequest);
         operation.setFee(calcFee(operation));
         operation.setConfirmationCode(confirmationCodeGenerator.get());
@@ -76,19 +76,21 @@ public class CardTransferService {
             throw new TransferException(operation, "Код подтверждения не совпадает.");
         }
 
-        doTransferTransaction(operation);
+        executeTransfer(operation);
         confirmOperationNow(operation);
 
         return new OperationSuccess(uid.toString());
     }
 
-    private void doTransferTransaction(CardTransferOperation operation) {
+    private void executeTransfer(CardTransferOperation operation) {
+        CardAccount cardFrom = null;
+        CardAccount cardTo = null;
         try {
-            CardAccount cardFrom = cardAccountService.getAccountLocked(operation.getCardFromNumber())
-                    .orElseThrow(() -> new TransferException(operation, "Ошибка получения карты отправителя."));
+            cardFrom = cardAccountService.getAccountLocked(operation.getCardFromNumber())
+                    .orElseThrow(() -> new TransferException(operation, "Счет отправителя недоступен."));
 
-            CardAccount cardTo = cardAccountService.getAccountLocked(operation.getCardToNumber())
-                    .orElseThrow(() -> new TransferException(operation, "Ошибка получения карты получателя."));
+            cardTo = cardAccountService.getAccountLocked(operation.getCardToNumber())
+                    .orElseThrow(() -> new TransferException(operation, "Счет получателя недоступен."));
 
             BigDecimal amountWithFee = operation.getAmount().add(operation.getFee());
 
@@ -105,8 +107,8 @@ public class CardTransferService {
         } catch (InterruptedException e) {
             throw new TransferException(operation, "Операция прервана.");
         } finally {
-            cardAccountService.releaseLock(operation.getCardFromNumber());
-            cardAccountService.releaseLock(operation.getCardToNumber());
+            if (cardFrom != null) cardAccountService.releaseLock(cardFrom.getCardNumber());
+            if (cardTo != null) cardAccountService.releaseLock(cardTo.getCardNumber());
         }
     }
 
