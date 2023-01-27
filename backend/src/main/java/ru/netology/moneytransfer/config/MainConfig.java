@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.map.repository.config.EnableMapRepositories;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -19,14 +20,12 @@ import ru.netology.moneytransfer.service.CardAccountService;
 @EnableMapRepositories("ru.netology.moneytransfer.repository")
 public class MainConfig implements WebMvcConfigurer {
 
-    @Autowired
-    ApplicationContext context;
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**");
     }
 
+    @Primary
     @Bean
     public CardAccountService cardAccountFileService(
             CardAccountRepository cardAccountRepository,

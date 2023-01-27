@@ -72,21 +72,18 @@ public class CardAccountFileService extends CardAccountService implements Initia
     @Override
     public CardAccount save(CardAccount cardAccount) {
         CardAccount savedCardAccount = super.save(cardAccount);
-        trySave();
+        tryExport();
         return savedCardAccount;
     }
 
-    private void trySave() {
-        if (isExportEnabled()) {
-            boolean locked = fileWriteLock.tryLock();
+    private void tryExport() {
+        if (isExportEnabled() && fileWriteLock.tryLock()) {
             try {
-                if (locked) {
-                    exportToFile(exportFilePath);
-                }
+                exportToFile(exportFilePath);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } finally {
-                if (locked) fileWriteLock.unlock();
+                fileWriteLock.unlock();
             }
         }
     }
