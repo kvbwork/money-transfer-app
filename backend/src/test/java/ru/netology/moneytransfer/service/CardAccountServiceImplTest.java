@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import ru.netology.moneytransfer.entity.CardAccount;
 import ru.netology.moneytransfer.mapper.CardAccountMapper;
 import ru.netology.moneytransfer.repository.CardAccountRepository;
+import ru.netology.moneytransfer.service.impl.CardAccountServiceImpl;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
@@ -23,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class CardAccountServiceTest {
+class CardAccountServiceImplTest {
 
     private static final BigDecimal TEST_AMOUNT = BigDecimal.valueOf(1000L);
 
@@ -31,7 +32,7 @@ class CardAccountServiceTest {
     CardAccount testCreditCardAccount;
     CardAccountRepository cardAccountRepository;
     CardAccountMapper cardAccountMapper;
-    CardAccountService sut;
+    CardAccountServiceImpl sut;
 
     @BeforeEach
     void setUp() {
@@ -40,7 +41,7 @@ class CardAccountServiceTest {
         cardAccountRepository = Mockito.mock(CardAccountRepository.class);
         cardAccountMapper = Mappers.getMapper(CardAccountMapper.class);
 
-        sut = new CardAccountService(cardAccountRepository, cardAccountMapper);
+        sut = new CardAccountServiceImpl(cardAccountRepository, cardAccountMapper);
         sut.setLockAwaitSeconds(1);
 
         Mockito.when(cardAccountRepository.findByCardNumber(testDebitCardAccount.getCardNumber()))

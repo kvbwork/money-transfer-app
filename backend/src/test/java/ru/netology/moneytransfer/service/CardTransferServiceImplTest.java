@@ -12,6 +12,7 @@ import ru.netology.moneytransfer.model.request.CardTransferRequest;
 import ru.netology.moneytransfer.model.request.TransferConfirmationRequest;
 import ru.netology.moneytransfer.model.response.OperationSuccess;
 import ru.netology.moneytransfer.repository.CardTransferOperationRepository;
+import ru.netology.moneytransfer.service.impl.CardTransferServiceImpl;
 import ru.netology.moneytransfer.validation.CardTransferOperationValidator;
 
 import java.math.BigDecimal;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class CardTransferServiceTest {
+class CardTransferServiceImplTest {
 
     static final BigDecimal TEST_AMOUNT_VALUE = new BigDecimal("1000");
     static final BigDecimal TEST_FEE_MULTIPLIER = new BigDecimal("0.01");
@@ -51,7 +52,7 @@ class CardTransferServiceTest {
     CardAccount cardAccountFrom;
     CardAccount cardAccountTo;
 
-    CardTransferService sut;
+    CardTransferServiceImpl sut;
 
     @BeforeEach
     void setUp() throws InterruptedException {
@@ -86,7 +87,7 @@ class CardTransferServiceTest {
         when(cardAccountFrom.getAmount()).thenReturn(ZERO);
         when(cardAccountTo.getAmount()).thenReturn(ZERO);
 
-        sut = new CardTransferService(
+        sut = new CardTransferServiceImpl(
                 cardTransferOperationRepository,
                 cardTransferOperationMapper,
                 cardAccountService,

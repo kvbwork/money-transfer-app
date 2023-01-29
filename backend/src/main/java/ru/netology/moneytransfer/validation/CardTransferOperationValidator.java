@@ -1,13 +1,17 @@
 package ru.netology.moneytransfer.validation;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import ru.netology.moneytransfer.entity.CardAccount;
 import ru.netology.moneytransfer.entity.CardTransferOperation;
 import ru.netology.moneytransfer.service.CardAccountService;
 
+import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
@@ -16,6 +20,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class CardTransferOperationValidator implements org.springframework.validation.Validator {
 
+    @Getter
+    @Setter
     @Value("${operation.currency.allowed:{}}")
     private Set<String> currencyAllowed;
 
@@ -24,6 +30,14 @@ public class CardTransferOperationValidator implements org.springframework.valid
     @Override
     public boolean supports(Class<?> clazz) {
         return CardTransferOperation.class.isAssignableFrom(clazz);
+    }
+
+    public void validate(CardTransferOperation operation) {
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(operation, "cardTransferOperation");
+        validate(operation, bindingResult);
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult.getFieldError().getDefaultMessage());
+        }
     }
 
     @Override
@@ -70,11 +84,4 @@ public class CardTransferOperationValidator implements org.springframework.valid
         }
     }
 
-    public Set<String> getCurrencyAllowed() {
-        return currencyAllowed;
-    }
-
-    public void setCurrencyAllowed(Set<String> currencyAllowed) {
-        this.currencyAllowed = currencyAllowed;
-    }
 }

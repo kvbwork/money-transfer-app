@@ -37,4 +37,15 @@ public class CardTransferOperation {
     private String confirmationCode;
     private LocalDateTime confirmedDateTime;
 
+    @Override
+    public String toString() {
+        return "Перевод " + id + " от " + createdDateTime +
+                " со счета " + cardFromNumber +
+                " на счет " + cardToNumber +
+                ", сумма: " + amount + " " + currency +
+                ", комиссия: " + fee + " " + currency +
+                ", код подтверждения: " + confirmationCode +
+                " (" + confirmedDateTime + ")";
+    }
+
 }

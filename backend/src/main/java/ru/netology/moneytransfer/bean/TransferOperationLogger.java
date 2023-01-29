@@ -1,5 +1,7 @@
 package ru.netology.moneytransfer.bean;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -9,7 +11,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import ru.netology.moneytransfer.entity.CardTransferOperation;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
@@ -19,6 +20,8 @@ import java.time.LocalDateTime;
 public class TransferOperationLogger implements InitializingBean, DisposableBean {
     private static Logger logger = LoggerFactory.getLogger(TransferOperationLogger.class);
 
+    @Getter
+    @Setter
     @Value("${operation.log.filepath}")
     private String logFileName;
 
@@ -36,43 +39,17 @@ public class TransferOperationLogger implements InitializingBean, DisposableBean
     }
 
     public void logSuccess(CardTransferOperation operation) {
-        String message = String.format("Успешный перевод %s от %s со счета %s на счет %s, сумма: %.2f %s, комиссия: %.2f %s. Подтверждено кодом: %s в %s",
-                operation.getId(),
-                operation.getCreatedDateTime(),
-                operation.getCardFromNumber(),
-                operation.getCardToNumber(),
-                operation.getAmount(), operation.getCurrency(),
-                operation.getFee(), operation.getCurrency(),
-                operation.getConfirmationCode(),
-                operation.getConfirmedDateTime()
-        );
+        String message = "Успешное завершение. " + operation;
         logger.info(message);
         writer.println(LocalDateTime.now() + " " + message);
         writer.flush();
     }
 
     public void logException(CardTransferOperation operation, Exception ex) {
-        String message = String.format("Ошибка! %s Перевод %s от %s со счета %s на счет %s, сумма: %.2f %s, комиссия: %.2f %s. Код подтверждения: %s (%s)",
-                ex.getMessage(),
-                operation.getId(),
-                operation.getCreatedDateTime(),
-                operation.getCardFromNumber(),
-                operation.getCardToNumber(),
-                operation.getAmount(), operation.getCurrency(),
-                operation.getFee(), operation.getCurrency(),
-                operation.getConfirmationCode(),
-                operation.getConfirmedDateTime()
-        );
+        String message = "Ошибка! " + ex.getMessage() + operation;
         logger.info(message);
         writer.println(LocalDateTime.now() + " " + message);
         writer.flush();
     }
 
-    public String getLogFileName() {
-        return logFileName;
-    }
-
-    public void setLogFileName(String logFileName) {
-        this.logFileName = logFileName;
-    }
 }

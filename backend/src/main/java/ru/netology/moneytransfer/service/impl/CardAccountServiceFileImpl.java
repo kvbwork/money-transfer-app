@@ -1,4 +1,4 @@
-package ru.netology.moneytransfer.service;
+package ru.netology.moneytransfer.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,20 +18,22 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-@Getter
-@Setter
-public class CardAccountFileService extends CardAccountService implements InitializingBean {
-    private static final Logger logger = LoggerFactory.getLogger(CardAccountFileService.class);
+public class CardAccountServiceFileImpl extends CardAccountServiceImpl implements InitializingBean {
+    private static final Logger logger = LoggerFactory.getLogger(CardAccountServiceFileImpl.class);
 
     private final Lock fileWriteLock = new ReentrantLock();
     private final ObjectMapper mapper;
 
     @Value("${cardaccounts.import.filepath:}")
+    @Getter
+    @Setter
     String importFilePath;
     @Value("${cardaccounts.export.filepath:}")
+    @Getter
+    @Setter
     String exportFilePath;
 
-    public CardAccountFileService(
+    public CardAccountServiceFileImpl(
             CardAccountRepository cardAccountRepository,
             CardAccountMapper cardAccountMapper,
             ObjectMapper mapper

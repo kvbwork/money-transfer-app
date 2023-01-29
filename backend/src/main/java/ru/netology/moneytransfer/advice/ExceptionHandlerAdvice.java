@@ -4,6 +4,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.netology.moneytransfer.exception.NotFoundException;
+import ru.netology.moneytransfer.exception.TransferException;
 import ru.netology.moneytransfer.model.response.OperationFailure;
 
 import javax.validation.ConstraintViolation;
@@ -42,8 +44,15 @@ public class ExceptionHandlerAdvice {
                 .body(new OperationFailure(getId(), "Невозможно прочитать входящее сообщение."));
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<OperationFailure> runtimeException(RuntimeException ex) {
+    @ExceptionHandler(TransferException.class)
+    public ResponseEntity<OperationFailure> transferException(TransferException ex) {
+        return ResponseEntity
+                .status(INTERNAL_SERVER_ERROR)
+                .body(new OperationFailure(getId(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<OperationFailure> notFoundException(NotFoundException ex) {
         return ResponseEntity
                 .status(INTERNAL_SERVER_ERROR)
                 .body(new OperationFailure(getId(), ex.getMessage()));
