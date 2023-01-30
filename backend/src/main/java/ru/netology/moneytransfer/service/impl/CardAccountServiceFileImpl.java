@@ -44,7 +44,7 @@ public class CardAccountServiceFileImpl extends CardAccountServiceImpl implement
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (isImportEnabled()) {
+        if (isImportEnabled() && cardAccountRepository.count() == 0) {
             logger.debug("Загрузка CardAccount из {}", getImportFilePath());
             int count = importFromFile(importFilePath);
             logger.info("В репозиторий добавлены CardAccount: {}", count);

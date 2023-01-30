@@ -20,7 +20,6 @@ import ru.netology.moneytransfer.service.CardAccountService;
 import ru.netology.moneytransfer.service.CardTransferService;
 import ru.netology.moneytransfer.validation.CardTransferOperationValidator;
 
-import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -41,7 +40,8 @@ public class CardTransferServiceImpl implements CardTransferService {
     @Setter
     private BigDecimal feeMultiplier;
 
-    @Override public OperationSuccess registerTransfer(CardTransferRequest cardTransferRequest) {
+    @Override
+    public OperationSuccess registerTransfer(CardTransferRequest cardTransferRequest) {
         CardTransferOperation operation = cardTransferOperationMapper.fromRequest(cardTransferRequest);
         operation.setFee(calcFee(operation));
         operation.setConfirmationCode(confirmationCodeGenerator.get());
@@ -55,7 +55,8 @@ public class CardTransferServiceImpl implements CardTransferService {
         return operation.getAmount().multiply(feeMultiplier);
     }
 
-    @Override public OperationSuccess confirmTransfer(TransferConfirmationRequest confirmationRequest) {
+    @Override
+    public OperationSuccess confirmTransfer(TransferConfirmationRequest confirmationRequest) {
         String operationId = confirmationRequest.getOperationId();
         UUID uid = UUID.fromString(operationId);
 

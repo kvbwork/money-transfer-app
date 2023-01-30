@@ -4,18 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.map.repository.config.EnableMapRepositories;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ru.netology.moneytransfer.mapper.CardAccountMapper;
 import ru.netology.moneytransfer.repository.CardAccountRepository;
-import ru.netology.moneytransfer.service.CardAccountService;
+import ru.netology.moneytransfer.repository.CardTransferOperationRepository;
+import ru.netology.moneytransfer.repository.impl.CardAccountRepositoryFileImpl;
+import ru.netology.moneytransfer.repository.impl.CardTransferOperationRepositoryFileImpl;
 import ru.netology.moneytransfer.service.impl.CardAccountServiceFileImpl;
 
 @Configuration
 @EnableAspectJAutoProxy
-@EnableMapRepositories("ru.netology.moneytransfer.repository")
 public class MainConfig implements WebMvcConfigurer {
 
     @Override
@@ -23,14 +22,23 @@ public class MainConfig implements WebMvcConfigurer {
         registry.addMapping("/**");
     }
 
-    @Primary
     @Bean
-    public CardAccountService cardAccountFileService(
+    public CardAccountServiceFileImpl cardAccountService(
             CardAccountRepository cardAccountRepository,
             CardAccountMapper cardAccountMapper,
             ObjectMapper objectMapper
     ) {
         return new CardAccountServiceFileImpl(cardAccountRepository, cardAccountMapper, objectMapper);
+    }
+
+    @Bean
+    public CardAccountRepository cardAccountRepository(ObjectMapper objectMapper) {
+        return new CardAccountRepositoryFileImpl(objectMapper);
+    }
+
+    @Bean
+    public CardTransferOperationRepository cardTransferOperationRepository(ObjectMapper objectMapper) {
+        return new CardTransferOperationRepositoryFileImpl(objectMapper);
     }
 
 }
